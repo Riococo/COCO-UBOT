@@ -5,40 +5,38 @@
 #
 """ Userbot help command """
 
-from userbot import CMD_HANDLER as cmd
-from userbot import CMD_HELP, EMOJI_HELP, bot
-from userbot.utils import edit_delete, edit_or_reply, ram_cmd
+import asyncio
+from userbot import ALIVE_NAME, CMD_HELP, REPO_NAME, EMOJI_HELP
+from userbot.events import register
+from platform import uname
 
 modules = CMD_HELP
 
+# ================= CONSTANT =================
+DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
+# ============================================
 
-@ram_cmd(pattern="help(?: |$)(.*)")
-async def help(event):
-    """For help command"""
-    args = event.pattern_match.group(1).lower()
+
+@register(outgoing=True, pattern="^.help(?: |$)(.*)")
+async def help(rambot):
+    """ For .help command,"""
+    args = rambot.pattern_match.group(1).lower()
     if args:
         if args in CMD_HELP:
-            await edit_or_reply(event, str(CMD_HELP[args]))
+            await rambot.edit(str(CMD_HELP[args]))
         else:
-            await edit_delete(event, f"𝘔𝘢𝘢𝘧 𝘔𝘰𝘥𝘶𝘭𝘦 `{args}` 𝘛𝘪𝘥𝘢𝘬 𝘋𝘢𝘱𝘢𝘵 𝘋𝘪𝘵𝘦𝘮𝘶𝘬𝘢𝘯!!")
+            await rambot.edit("**`NGETIK YANG BENER NGENTOT!`**")
+            await asyncio.sleep(50)
+            await rambot.delete()
     else:
-        user = await bot.get_me()
         string = ""
         for i in CMD_HELP:
             string += "`" + str(i)
-            string += f"`\t\t\t{EMOJI_HELP}\t\t\t"
-        await edit_or_reply(
-            event,
-            f"{EMOJI_HELP}   {string}"
-            f"\n\nSupport @RAM_UBOT\n"
-        )
-        await event.reply(
-            f"╭┄──────┈┄┈──────┄\n"
-            f"│ ▸ **Daftar Perintah RAM-UBOT :**\n"
-            f"│ ▸ **Jumlah** `{len(modules)}` **Modules**\n"
-            f"│ ▸ **Owner:** [{user.first_name}](tg://user?id={user.id})\n"
-            f"├┄─────┈┄┈─────┄\n"
-            f"│ **Contoh Ketik** `{cmd}help ping`\n"
-            f"│ **Untuk Melihat Informasi Module**\n"
-            f"╰┄──────┈┈──────┄"
-        )
+            string += f"`\t {EMOJI_HELP}  "
+        await rambot.edit(f"**{REPO_NAME}**\n\n"
+                         f"**{EMOJI_HELP} 𝙿𝙴𝙼𝙸𝙻𝙸𝙺 𝙱𝙾𝚃 : {DEFAULTUSER}**\n**{EMOJI_HELP}  𝙼𝙾𝙳𝚄𝙻𝙴𝚂 : {len(modules)}**\n\n"
+                         f"**{EMOJI_HELP} 𝚂𝙴𝙼𝚄𝙰 𝙼𝙴𝙽𝚄 :**\n\n ══════════╣❃ ♕ ❃╠══════════\n\n"
+                         f"{EMOJI_HELP} {string}\n\n ══════════╣❃ ♕ ❃╠══════════\n\nNGETIK YANG BENER YA NGENTOOOOT!!\n\n")
+        await rambot.reply(f"\n**Contoh** : Ketik <`.help ping`> Untuk Informasi Pengunaan.\nJangan Lupa Berdoa Sebelum Mencoba wahahaha..")
+        await asyncio.sleep(50)
+        await rambot.delete()

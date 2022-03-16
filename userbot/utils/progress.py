@@ -60,7 +60,7 @@ def time_formatter(seconds: int) -> str:
     return tmp[:-2]
 
 
-def human_to_bytes(size: str) -> int:
+def huram_to_bytes(size: str) -> int:
     units = {
         "M": 2 ** 20,
         "MB": 2 ** 20,

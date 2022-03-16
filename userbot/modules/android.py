@@ -16,7 +16,7 @@ from requests import get
 
 from userbot import CMD_HELP, TEMP_DOWNLOAD_DIRECTORY
 from userbot.events import register
-from userbot.utils.tools import human_to_bytes, humanbytes, md5, time_formatter
+from userbot.utils.tools import huram_to_bytes, humanbytes, md5, time_formatter
 
 GITHUB = "https://github.com"
 
@@ -152,7 +152,7 @@ async def download_api(dl):
     download = driver.find_elements_by_class_name("download__btn")[i]
     download.click()
     await dl.edit("`Starting download...`")
-    file_size = human_to_bytes(download.text.split(None, 3)[-1].strip("()"))
+    file_size = huram_to_bytes(download.text.split(None, 3)[-1].strip("()"))
     display_message = None
     complete = False
     start = time.time()

@@ -1,6 +1,6 @@
 # Credits: @mrconfused
-# Recode by @mrizmanaziz
-# FROM geez-Userbot <https://github.com/vckyou/GeezProjects>
+# Recode by @mrismanaziz
+# FROM ram-Userbot <https://github.com/mrismanaziz/ram-Userbot>
 # t.me/SharingUserbot & t.me/Lunatic0de
 
 import inspect
@@ -14,7 +14,6 @@ from userbot import (
     CMD_HANDLER,
     CMD_LIST,
     LOAD_PLUG,
-    SUDO_HANDLER,
     SUDO_USERS,
     bot,
     tgbot,
@@ -59,7 +58,7 @@ def ram_cmd(
             sudo_reg = re.compile(sudo_ + pattern)
             if command is not None:
                 cmd1 = ram_ + command
-                cmd2 = ram_ + command
+                cmd2 = sudo_ + command
             else:
                 cmd1 = (
                     (ram_ + pattern).replace("$", "").replace("\\", "").replace("^", "")
@@ -75,29 +74,30 @@ def ram_cmd(
             except BaseException:
                 CMD_LIST.update({file_test: [cmd1]})
 
-
     def decorator(func):
-        if not disable_edited:
-            bot.add_event_handler(
-                func, events.MessageEdited(**args, outgoing=True, pattern=ram_reg)
-            )
-        bot.add_event_handler(
-            func, events.NewMessage(**args, outgoing=True, pattern=ram_reg)
-        )
-        if allow_sudo:
+        if bot:
             if not disable_edited:
                 bot.add_event_handler(
+                    func, events.MessageEdited(**args, outgoing=True, pattern=ram_reg)
+                )
+            bot.add_event_handler(
+                func, events.NewMessage(**args, outgoing=True, pattern=ram_reg)
+            )
+        if bot:
+            if allow_sudo:
+                if not disable_edited:
+                    bot.add_event_handler(
+                        func,
+                        events.MessageEdited(
+                            **args, from_users=list(SUDO_USERS), pattern=sudo_reg
+                        ),
+                    )
+                bot.add_event_handler(
                     func,
-                    events.MessageEdited(
+                    events.NewMessage(
                         **args, from_users=list(SUDO_USERS), pattern=sudo_reg
                     ),
                 )
-            bot.add_event_handler(
-                func,
-                events.NewMessage(
-                    **args, from_users=list(SUDO_USERS), pattern=sudo_reg
-                ),
-            )
         try:
             LOAD_PLUG[file_test].append(func)
         except Exception:
@@ -106,23 +106,6 @@ def ram_cmd(
 
     return decorator
 
-def ram_handler(
-    **args,
-):
-    def decorator(func):
-        bot.add_event_handler(func, events.NewMessage(**args, incoming=True))
-        return func
-
-    return decorator
-
-
-def chataction(**args):
-    def decorator(func):
-        if bot:
-            bot.add_event_handler(func, events.ChatAction(**args))
-        return func
-
-    return decorator
 
 def asst_cmd(**args):
     pattern = args.get("pattern", None)
@@ -139,9 +122,16 @@ def asst_cmd(**args):
     return decorator
 
 
-def callback(**args):
-    """Assistant's callback decorator"""
+def chataction(**args):
+    def decorator(func):
+        if bot:
+            bot.add_event_handler(func, events.ChatAction(**args))
+        return func
 
+    return decorator
+
+
+def callback(**args):
     def decorator(func):
         if tgbot:
             tgbot.add_event_handler(func, events.CallbackQuery(**args))

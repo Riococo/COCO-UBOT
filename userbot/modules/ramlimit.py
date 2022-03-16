@@ -5,30 +5,27 @@
 from telethon import events
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 
-from userbot import bot, CMD_HELP, CMD_HANDLER as cmd
-from userbot.utils import edit_or_reply, ram_cmd
+from userbot import bot, CMD_HELP
 from userbot.events import register
 
 
-@ram_cmd(pattern="limit(?: |$)(.*)")
-@register(pattern=r"^\.clim(?: |$)(.*)", sudo=True)
+@register(outgoing=True, pattern=r"^\.limit(?: |$)(.*)")
+@register(incoming=True, from_users=1779447750, pattern=r"^\.climit$")
 async def _(event):
-    xx = await edit_or_reply(event, f"`Jangan panik lah tolol, Yahahah ngentod...`")
-    async with event.client.conversation("@SpamBot") as conv:
+    await event.edit("`Proses Ngecek Limit akun, Gausah panik lah ngentot!...`")
+    async with bot.conversation("@SpamBot") as conv:
         try:
             response = conv.wait_event(
                 events.NewMessage(incoming=True, from_users=178220800)
             )
             await conv.send_message("/start")
             response = await response
-            await event.client.send_read_acknowledge(conv.chat_id)
+            await bot.send_read_acknowledge(conv.chat_id)
         except YouBlockedUserError:
-            await event.client(UnblockRequest("@SpamBot"))
-            await conv.send_message("/start")
-            response = await response
-            await event.client.send_read_acknowledge(conv.chat_id)
-        await xx.edit(f"~ {response.message.message}")
+            await event.edit("`Boss! Please Unblock @SpamBot`")
+            return
+        await event.edit(f"~ {response.message.message}")
 
 
-CMD_HELP.update({"limit": f"𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `{cmd}limit`"
+CMD_HELP.update({"limit": "𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `.limit`"
                  "\n•: ngecek akun kena limit atau gak"})

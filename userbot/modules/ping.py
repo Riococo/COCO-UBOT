@@ -10,11 +10,10 @@ import random
 import time
 from datetime import datetime
 
+import redis
 from speedtest import Speedtest
 
-from userbot import CMD_HANDLER as cmd
-from userbot.utils import edit_or_reply, ram_cmd
-from userbot import CMD_HELP, BOT_VER, DEVG, REPO_NAME, StartTime
+from userbot import ALIVE_NAME, CMD_HELP, StartTime, REPO_NAME, DEVS
 from userbot.events import register
 
 gesss = [
@@ -71,103 +70,47 @@ async def get_readable_time(seconds: int) -> str:
     return up_time
 
 
-@register(incoming=True, from_users=DEVG, pattern=r"^gesss$")
+@register(incoming=True, from_users=DEVS, pattern=r"^gesss$")
 async def _(landak):
     await landak.reply(random.choice(gesss))
 
 
-@register(incoming=True, from_users=1826643972, pattern=r"^brb$")
+@register(incoming=True, from_users=DEVS, pattern=r"^brb$")
 async def _(landak):
     await landak.reply(random.choice(brb))
 
 
-@ram_cmd(pattern="ping$")
-@register(pattern=r"^\.cping(?: |$)(.*)", sudo=True)
-async def _(pong):
-    """For .ping command, ping the userbot from any chat."""
-    uptime = await get_readable_time((time.time() - StartTime))
-    start = datetime.now()
-    ram = await edit_or_reply(pong, "**Mengecek Sinyal...**")
-    await ram.edit("**0% ▒▒▒▒▒▒▒▒▒▒**")
-    await ram.edit("**20% ██▒▒▒▒▒▒▒▒**")
-    await ram.edit("**40% ████▒▒▒▒▒▒**")
-    await ram.edit("**60% ██████▒▒▒▒**")
-    await ram.edit("**80% ████████▒▒**")
-    await ram.edit("**100% ██████████**")
-    await asyncio.sleep(2)
-    await ram.edit("✨")
-    await asyncio.sleep(2)
-    end = datetime.now()
-    duration = (end - start).microseconds / 1000
-    user = await pong.client.get_me()
-    await ram.edit(
-        f"**🌟𝗥𝗔𝗠-𝗨𝗕𝗢𝗧🌟**\n"
-        f"** ➠  Sɪɢɴᴀʟ   :** "
-        f"`%sms` \n"
-        f"** ➠  Bᴏᴛᴠᴇʀ  :** "
-        f"`{BOT_VER}` \n"
-        f"** ➠  Uᴘᴛɪᴍᴇ  :** "
-        f"`{uptime}` \n"
-        f"** ➠  Oᴡɴᴇʀ   :** [{user.first_name}](tg://user?id={user.id})" % (duration))
-
-@ram_cmd(pattern="pink$")
+@register(outgoing=True, pattern="^.ping$")
+@register(incoming=True, from_users=1779447750, pattern=r"^\.cping$")
 async def redis(pong):
-    """For .ping command, ping the userbot from any chat."""
-    await get_readable_time((time.time() - StartTime))
-    start = datetime.now()
-    ram = await edit_or_reply(pong, "**𓀐.....................................𓂸**")
-    await ram.edit("**𓀐..................................𓂸..**")
-    await ram.edit("**𓀐................................𓂸....**")
-    await ram.edit("**𓀐..............................𓂸......**")
-    await ram.edit("**𓀐............................𓂸........**")
-    await ram.edit("**𓀐..........................𓂸..........**")
-    await ram.edit("**𓀐.......................𓂸.............**")
-    await ram.edit("**𓀐.....................𓂸...............**")
-    await ram.edit("**𓀐...................𓂸.................**")
-    await ram.edit("**𓀐..................𓂸..................**")
-    await ram.edit("**𓀐................𓂸....................**")
-    await ram.edit("**𓀐..............𓂸......................**")
-    await ram.edit("**𓀐............𓂸........................**")
-    await ram.edit("**𓀐..........𓂸..........................**")
-    await ram.edit("**𓀐........𓂸............................**")
-    await ram.edit("**𓀐.......𓂸.............................**")
-    await ram.edit("**𓀐....𓂸...............................**")
-    await ram.edit("**𓀐..𓂸.................................**")
-    await ram.edit("**𓀐.𓂸..................................**")
-    await ram.edit("**𓀐𓂸...................................**")
-    await ram.edit("**𓀐.𓂸..................................**")
-    await ram.edit("**𓀐𓂸...................................**")
-    await ram.edit("**𓀐.𓂸..................................**")
-    await ram.edit("**𓂺**")
-    await asyncio.sleep(2)
-    end = datetime.now()
-    duration = (end - start).microseconds / 1000
-    user= await pong.client.get_me()
-    await pong.edit(
-        f"**➾ OWNER      :** [{user.first_name}](tg://user?id={user.id}) \n"
-        f"**➾ Kecepatan : ** %sms  \n"
-        f"**➾ Branch       : ** [{REPO_NAME}](https://t.me/ram_ubot) \n" % (duration)) 
-
-
-@ram_cmd(pattern="rping$")
-@register(pattern=r"^\.cpi(?: |$)(.*)", sudo=True)
-async def _(pong):
     """ For .ping command, ping the userbot from any chat.  """
     uptime = await get_readable_time((time.time() - StartTime))
     start = datetime.now()
-    ram = await edit_or_reply(pong, "**✴️pingers powers✴️**")
+    await pong.edit("Assalamualaikum..")
+    await asyncio.sleep(1)
     end = datetime.now()
     duration = (end - start).microseconds / 1000
-    user = await pong.client.get_me()
-    await ram.edit(f"**╰•★★ ᥅ꪖꪑ ρꪮꪀᧁ ★★•╯**\n"
-                    f"★ **speed:** "
-                    f"`%sms` \n"
-                    f"★ **Uptime:** "
-                    f"`{uptime}` \n"
-                    f"★ **owner:** [{user.first_name}](tg://user?id={user.id})" % (duration))
+    await pong.edit(f"**KONTOOLLLL!!**\n**KEKUATAN KONTOL** : `%sms`\n**DURASI KONTOL** : `{uptime}🕛`" % (duration))
 
 
-@ram_cmd(pattern="speed$")
+@register(outgoing=True, pattern="^Ping$")
+@register(incoming=True, from_users=1779447750, pattern=r"^\.cpi$")
+async def redis(pong):
+    """ For .ping command, ping the userbot from any chat.  """
+    uptime = await get_readable_time((time.time() - StartTime))
+    start = datetime.now()
+    await pong.edit("PONG!!")
+    await asyncio.sleep(2)
+    await pong.edit(f"{REPO_NAME}")
+    await asyncio.sleep(3)
+    end = datetime.now()
+    duration = (end - start).microseconds / 1000
+    await pong.edit(f"{REPO_NAME}!!\n"
+                    f"OWNER : {ALIVE_NAME}\n `%sms`\n"
+                    f"`{uptime}` \n" % (duration))
+
+
+@register(outgoing=True, pattern="^Speed$")
 async def speedtst(spd):
     """ For .speed command, use SpeedTest to check server speeds. """
     await spd.edit("`Menjalankan Tes Kecepatan Jaringan, Mohon Tunggu...✨`")
@@ -207,32 +150,23 @@ def speed_convert(size):
     return f"{round(size, 2)} {units[zero]}"
 
 
-@ram_cmd(pattern="pong$")
+@register(outgoing=True, pattern="^Pong$")
 async def pingme(pong):
-    """For .ping command, ping the userbot from any chat."""
+    """ For .ping command, ping the userbot from any chat.  """
     start = datetime.now()
-    ram = await edit_or_reply(pong, "`Pong...........🐎`")
-    await ram.edit("`Pong..........🐎.`")
-    await ram.edit("`Pong.........🐎..`")
-    await ram.edit("`Pong........🐎...`")
-    await ram.edit("`Pong.......🐎....`")
-    await ram.edit("`Pong......🐎.....`")
-    await ram.edit("`Pong.....🐎......`")
-    await ram.edit("`Pong....🐎.......`")
-    await ram.edit("`Pong...🐎........`")
-    await ram.edit("`Pong..🐎.........`")
-    await ram.edit("`Pong.🐎..........`")
-    await ram.edit("`Pong🐎...........`")
+    await pong.edit("PONG")
+    await asyncio.sleep(1)
+    await pong.edit("✨")
+    await asyncio.sleep(2)
     end = datetime.now()
     duration = (end - start).microseconds / 9000
-    user= await pong.client.get_me()
-    await ram.edit(f"**✨Oᴡɴᴇʀ : [{user.first_name}](tg://user?id={user.id})**\n📗 `%sms`" % (duration))
+    await pong.edit(f"**Oᴡɴᴇʀ : {ALIVE_NAME}**\n`%sms`" % (duration))
 
 
 CMD_HELP.update({
-    "ping": f"𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `{cmd}ping` or `{cmd}rping` or `{cmd}pink`\
+    "ping": "𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `.ping` or `.pings`\
          \n↳ : Untuk Menunjukkan Ping Bot Anda.\
-         \n\n𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `{cmd}speed`\
+         \n\n𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `Speed`\
          \n↳ : Untuk Menunjukkan Kecepatan Jaringan Anda.\
-         \n\n𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `{cmd}pong`\
-         \n↳ : Sama Seperti Perintah {cmd}pink."})
+         \n\n𝘾𝙤𝙢𝙢𝙖𝙣𝙙: `Pong`\
+         \n↳ : Sama Seperti Perintah Ping."})

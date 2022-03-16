@@ -1,9 +1,11 @@
-from sqlalchemy import Column, Numeric, String, UnicodeText
+try:
+    from userbot.modules.sql_helper import SESSION, BASE
+except ImportError:
+    raise AttributeError
+from sqlalchemy import Column, UnicodeText, Numeric, String
 
-from userbot.modules.sql_helper import BASE, SESSION
 
-
-class Filter(BASE):
+class Filters(BASE):
     __tablename__ = "filters"
     chat_id = Column(String(14), primary_key=True)
     keyword = Column(UnicodeText, primary_key=True, nullable=False)
@@ -18,25 +20,24 @@ class Filter(BASE):
 
     def __eq__(self, other):
         return bool(
-            isinstance(other, Filter)
-            and self.chat_id == other.chat_id
-            and self.keyword == other.keyword
-        )
+            isinstance(other, Filters) and self.chat_id == other.chat_id
+            and self.keyword == other.keyword)
 
 
-Filter.__table__.create(checkfirst=True)
+Filters.__table__.create(checkfirst=True)
 
 
 def get_filter(chat_id, keyword):
     try:
-        return SESSION.query(Filter).get((str(chat_id), keyword))
+        return SESSION.query(Filters).get((str(chat_id), keyword))
     finally:
         SESSION.close()
 
 
 def get_filters(chat_id):
     try:
-        return SESSION.query(Filter).filter(Filter.chat_id == str(chat_id)).all()
+        return SESSION.query(Filters).filter(
+            Filters.chat_id == str(chat_id)).all()
     finally:
         SESSION.close()
 
@@ -44,31 +45,26 @@ def get_filters(chat_id):
 def add_filter(chat_id, keyword, reply, f_mesg_id):
     to_check = get_filter(chat_id, keyword)
     if not to_check:
-        adder = Filter(str(chat_id), keyword, reply, f_mesg_id)
+        adder = Filters(str(chat_id), keyword, reply, f_mesg_id)
         SESSION.add(adder)
         SESSION.commit()
         return True
-    rem = SESSION.query(Filter).get((str(chat_id), keyword))
-    SESSION.delete(rem)
-    SESSION.commit()
-    adder = Filter(str(chat_id), keyword, reply, f_mesg_id)
-    SESSION.add(adder)
-    SESSION.commit()
-    return False
+    else:
+        rem = SESSION.query(Filters).get((str(chat_id), keyword))
+        SESSION.delete(rem)
+        SESSION.commit()
+        adder = Filters(str(chat_id), keyword, reply, f_mesg_id)
+        SESSION.add(adder)
+        SESSION.commit()
+        return False
 
 
 def remove_filter(chat_id, keyword):
     to_check = get_filter(chat_id, keyword)
     if not to_check:
         return False
-    rem = SESSION.query(Filter).get((str(chat_id), keyword))
-    SESSION.delete(rem)
-    SESSION.commit()
-    return True
-
-
-def remove_all_filters(chat_id):
-    saved_filter = SESSION.query(Filter).filter(Filter.chat_id == str(chat_id))
-    if saved_filter:
-        saved_filter.delete()
+    else:
+        rem = SESSION.query(Filters).get((str(chat_id), keyword))
+        SESSION.delete(rem)
         SESSION.commit()
+        return True

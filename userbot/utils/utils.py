@@ -1,6 +1,6 @@
-# Credits: @lahtololdah
-# Thaks For Risman <Man-Userbot>
-# t.me/SharingUserbot & t.me/Geezsupport
+# Credits: @mrismanaziz
+# FROM ram-Userbot <https://github.com/mrismanaziz/ram-Userbot>
+# t.me/SharingUserbot & t.me/Lunatic0de
 
 import asyncio
 import importlib
@@ -36,10 +36,10 @@ async def autobot():
         return
     await bot.start()
     await bot.send_message(
-        BOTLOG_CHATID, "**GUA LAGI BIKIN BOT ASISSTANT DI @BOTFATHER YA NGENTOD, SABAR DULU LU, KALO GA SABAR MATI AJA NYUSUL BAPAK LO**"
+        BOTLOG_CHATID, "**SEDANG MEMBUAT BOT TELEGRAM UNTUK ANDA DI @BotFather**"
     )
     who = await bot.get_me()
-    name = who.first_name + " Assistant RAM-UBOT"
+    name = who.first_name + " Assistant Bot"
     if who.username:
         username = who.username + "_ubot"
     else:
@@ -76,7 +76,7 @@ async def autobot():
     await bot.send_read_acknowledge("botfather")
     if isdone.startswith("Sorry,"):
         ran = randint(1, 100)
-        username = "Asisstant" + (str(who.id))[6:] + str(ran) + "Bot"
+        username = "ram" + (str(who.id))[6:] + str(ran) + "ubot"
         await bot.send_message(bf, username)
         await asyncio.sleep(1)
         nowdone = (await bot.get_messages(bf, limit=1))[0].text
@@ -92,20 +92,20 @@ async def autobot():
             await asyncio.sleep(1)
             await bot.send_message(bf, f"@{username}")
             await asyncio.sleep(1)
-            await bot.send_file(bf, "userbot/utils/styles/RAMUBOT.jpg")
+            await bot.send_file(bf, "userbot/resources/logo.jpg")
             await asyncio.sleep(3)
             await bot.send_message(bf, "/setabouttext")
             await asyncio.sleep(1)
             await bot.send_message(bf, f"@{username}")
             await asyncio.sleep(1)
-            await bot.send_message(bf, f"Asisstan punya si kontol {who.first_name}")
+            await bot.send_message(bf, f"Managed With ☕️ By {who.first_name}")
             await asyncio.sleep(3)
             await bot.send_message(bf, "/setdescription")
             await asyncio.sleep(1)
             await bot.send_message(bf, f"@{username}")
             await asyncio.sleep(1)
             await bot.send_message(
-                bf, f"✨ Owner ~ {who.first_name} ✨\n\n✨ Powered By ~ @TEERVIgroup ✨"
+                bf, f"✨ Owner ~ {who.first_name} ✨\n\n✨ Powered By ~ @Lunatic0de ✨"
             )
             await bot.send_message(
                 BOTLOG_CHATID,
@@ -134,20 +134,20 @@ async def autobot():
         await asyncio.sleep(1)
         await bot.send_message(bf, f"@{username}")
         await asyncio.sleep(1)
-        await bot.send_file(bf, "userbot/utils/styles/RAMUBOT.jpg")
+        await bot.send_file(bf, "userbot/resources/logo.jpg")
         await asyncio.sleep(3)
         await bot.send_message(bf, "/setabouttext")
         await asyncio.sleep(1)
         await bot.send_message(bf, f"@{username}")
         await asyncio.sleep(1)
-        await bot.send_message(bf, f"Buatan anak kontol {who.first_name}")
+        await bot.send_message(bf, f"Managed With ☕️ By {who.first_name}")
         await asyncio.sleep(3)
         await bot.send_message(bf, "/setdescription")
         await asyncio.sleep(1)
         await bot.send_message(bf, f"@{username}")
         await asyncio.sleep(1)
         await bot.send_message(
-            bf, f"✨ Owner ~ {who.first_name} ✨\n\n✨ Powered By ~ @TEERVIgroup ✨"
+            bf, f"✨ Owner ~ {who.first_name} ✨\n\n✨ Powered By ~ @Lunatic0de ✨"
         )
         await bot.send_message(
             BOTLOG_CHATID,

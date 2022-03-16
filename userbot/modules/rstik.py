@@ -1,17 +1,39 @@
 import random
+import re
 
-from userbot.utils import deEmojify, edit_or_reply, ram_cmd
+from userbot import bot, CMD_HELP
+from userbot.events import register
+from asyncio import sleep
+EMOJI_PATTERN = re.compile(
+    "["
+    "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+    "\U0001F300-\U0001F5FF"  # symbols & pictographs
+    "\U0001F600-\U0001F64F"  # emoticons
+    "\U0001F680-\U0001F6FF"  # transport & map symbols
+    "\U0001F700-\U0001F77F"  # alchemical symbols
+    "\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
+    "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+    "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+    "\U0001FA00-\U0001FA6F"  # Chess Symbols
+    "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+    "\U00002702-\U000027B0"  # Dingbats
+    "]+"
+)
 
 
-@ram_cmd(pattern="rst(?: |$)(.*)")
+def deEmojify(inputString: str) -> str:
+    return re.sub(EMOJI_PATTERN, "", inputString)
+
+
+@register(outgoing=True, pattern=r"^\.rst(?: |$)(.*)")
 async def rastick(animu):
     text = animu.pattern_match.group(1)
-    xx = await edit_or_reply(animu, f"`Sabar, Sedang memuat...`")
     if not text:
         if animu.is_reply:
             text = (await animu.get_reply_message()).message
         else:
-            return await xx.answer(f"**Mohoh berikan Sesuatu pesan...**")
+            await animu.answer("`No text given, hence no stickers.`")
+            return
     animus = [
         1,
         2,
@@ -77,20 +99,28 @@ async def rastick(animu):
         62,
         63,
     ]
-    sticcers = await animu.client.inline_query(
+    sticcers = await bot.inline_query(
         "stickerizerbot", f"#{random.choice(animus)}{(deEmojify(text))}"
     )
     try:
         await sticcers[0].click(
             animu.chat_id,
             reply_to=animu.reply_to_msg_id,
-            silent=bool(animu.is_reply),
+            silent=True if animu.is_reply else False,
             hide_via=True,
         )
-
     except Exception:
-        return await edit_delete(
-            xx,
-            "**You cannot send inline results in this chat**",
+        return await animu.edit(
+            "`You cannot send inline results in this chat (caused by SendInlineBotResultRequest)`"
         )
-    await xx.delete()
+    await sleep(5)
+    await animu.delete()
+
+
+CMD_HELP.update(
+    {
+        "rastick": ">`.rst`"
+        "\nUsage: To stickerize your text with random sticker templates."
+        "\n@StickerizerBot"
+    }
+)

@@ -13,20 +13,20 @@ import sys
 import time
 from datetime import datetime
 import psutil
+
+from userbot import ALIVE_LOGO, ALIVE_NAME, BOT_VER, CMD_HELP, RAM_TEKS_KOSTUM, IG_ALIVE, REPO_NAME, GROUP_LINK, StartTime, bot
 from userbot.events import register
-from userbot import ALIVE_LOGO, CMD_HELP, GROUP_LINK, IG_ALIVE, RAM_TEKS_KOSTUM, REPO_NAME, BOT_VER, StartTime, bot
-from userbot import CMD_HANDLER as cmd
-from userbot.utils import ram_cmd
+
 
 # ================= CONSTANT =================
-
+DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
 # ============================================
 
 
 modules = CMD_HELP
 
 
-async def get_readable_time(seconds: int) -> str: 
+async def get_readable_time(seconds: int) -> str:
     count = 0
     up_time = ""
     time_list = []
@@ -53,7 +53,7 @@ async def get_readable_time(seconds: int) -> str:
     return up_time
 
 
-@ram_cmd(pattern=r"spc")
+@register(outgoing=True, pattern=r"^\.spc")
 async def psu(event):
     uname = platform.uname()
     softw = "**Informasi Sistem**\n"
@@ -111,7 +111,7 @@ def get_size(bytes, suffix="B"):
         bytes /= factor
 
 
-@ram_cmd(pattern=r"sysd$")
+@register(outgoing=True, pattern=r"^\.sysd$")
 async def sysdetails(sysd):
     if not sysd.text[0].isalpha() and sysd.text[0] not in ("/", "#", "@", "!"):
         try:
@@ -131,7 +131,7 @@ async def sysdetails(sysd):
             await sysd.edit("`Install neofetch first !!`")
 
 
-@ram_cmd(pattern=r"botver$")
+@register(outgoing=True, pattern=r"^\.botver$")
 async def bot_ver(event):
     if event.text[0].isalpha() or event.text[0] in ("/", "#", "@", "!"):
         return
@@ -170,7 +170,7 @@ async def bot_ver(event):
         )
 
 
-@ram_cmd(pattern=r"pip(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^\.pip(?: |$)(.*)")
 async def pipcheck(pip):
     if pip.text[0].isalpha() or pip.text[0] in ("/", "#", "@", "!"):
         return
@@ -218,7 +218,7 @@ async def pipcheck(pip):
         await pip.edit("Gunakan `.help pip` Untuk Melihat Contoh")
 
 
-@ram_cmd(pattern=r"(?:ram|rambot)\s?(.)?")
+@register(outgoing=True, pattern=r"^\.(?:ram|rambot)\s?(.)?")
 async def amireallyalive(alive):
     user = await bot.get_me()
     await get_readable_time((time.time() - StartTime))
@@ -231,13 +231,13 @@ async def amireallyalive(alive):
         f"\n__**{RAM_TEKS_KOSTUM}**__\n"
         f"**▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰**\n"
         f"**🤑 TUAN** \n"
-        f" ➥ `{user.first_name}` \n"
+        f" ➥ `{DEFAULTUSER}` \n"
         f"**😋 Username** \n"
         f" ➥ `@{user.username}` \n"
         f"╭✠╼━━━━━━❖━━━━━━━✠╮\n"
         f"┣• `🙈 Telethon :`Ver {version.__version__} \n"
         f"┣• `🥴 Python   :`Ver {python_version()} \n"
-        f"┣• `🤖 Bot Ver  :`{BOT_VER} \n"
+        f"┣• `🤖 Bot Ver  :`7.0 \n"
         f"┣• `✨ Modules  :`{len(modules)} \n"
         f"╰✠╼━━━━━━❖━━━━━━━✠╯\n"
         f"▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ \n"
@@ -263,7 +263,7 @@ async def amireallyalive(alive):
         await alive.delete()
 
 
-@ram_cmd(pattern=r"(?:ralive|ron)\s?(.)?")
+@register(outgoing=True, pattern=r"^\.(?:ralive|ron)\s?(.)?")
 async def amireallyalive(alive):
     user = await bot.get_me()
     await get_readable_time((time.time() - StartTime))
@@ -271,11 +271,11 @@ async def amireallyalive(alive):
         f"**╭✠╼━━━━━━❖━━━━━━━✠╮**\n"
         f"       **♕  ⭐️𝗥𝗔𝗠-𝗨𝗕𝗢𝗧⭐️  ♕** \n"
         f"**╰✠╼━━━━━━❖━━━━━━━✠╯**\n"
-        f"❃ **Tuan**             ➥ `{user.first_name}` \n"
+        f"❃ **Tuan**             ➥ `{DEFAULTUSER}` \n"
         f"❃ **Username**    ➥ `@{user.username}` \n"
         f"❃ **Telethon**       ➥ `Versi {version.__version__}` \n"
         f"❃ **Python**          ➥ `Versi {python_version()}` \n"
-        f"❃ **Versi Bot**      ➥ `{BOT_VER}` \n"
+        f"❃ **Versi Bot**      ➥ `7.0` \n"
         f"❃ **Modul**           ➥ `{len(modules)}` \n\n"
         f"**▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰**\n"
         f"[{REPO_NAME}](https://github.com/ramadhani892/RAM-UBOT) || [𝗚𝗥𝗢𝗨𝗣]({GROUP_LINK}) || [𝗜𝗡𝗦𝗧𝗔𝗚𝗥𝗔𝗠]({IG_ALIVE})\n"
@@ -300,28 +300,27 @@ async def amireallyalive(alive):
         await alive.delete()
 
 
-@ram_cmd(pattern=r"(?:alive|on)\s?(.)?")
-@register(pattern=r"^\.(?:clive|on)\s?(.)?", sudo=True)
+@register(outgoing=True, pattern=r"^\.(?:alive|on)\s?(.)?")
 async def amireallyalive(alive):
     user = await bot.get_me()
     await get_readable_time((time.time() - StartTime))
     await alive.edit("`Perkenalan diri...⭐`")
     await asyncio.sleep(1)
     await alive.edit("✨")
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
     output = (
         f"**✠╼━━━━━━❖━━━━━━━✠ ** \n"
         f"**          ⭐️𝗥𝗔𝗠-𝗨𝗕𝗢𝗧⭐️** \n"
         f"**✠╼━━━━━━❖━━━━━━━✠** \n"
         f"╭✠╼━━━━━━❖━━━━━━━✠╮ \n"
-        f"┣|• `🤴 Majikan  :`{user.first_name} \n"
+        f"┣|• `🤴 Majikan  :`{DEFAULTUSER} \n"
         f"┣|• `💳 Username :`@{user.username} \n"
         f"┣|• `👺 Telethon :`Ver {version.__version__} \n"
         f"┣|• `🐉 Python   :`Ver {python_version()} \n"
         f"╰✠╼━━━━━━❖━━━━━━━✠╯ \n"
         f"╭✠╼━━━━━━❖━━━━━━━✠╮ \n"
         f"┣|• `Branch      :`RAM-UBOT \n"
-        f"┣|• `Bot Ver     :`{BOT_VER} \n"
+        f"┣|• `Bot Ver     :`7.0 \n"
         f"┣|• `Modules     :`{len(modules)} Modules \n"
         f"╰✠╼━━━━━━❖━━━━━━━✠╯ \n"
         f"▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ \n"
@@ -347,7 +346,7 @@ async def amireallyalive(alive):
         await alive.delete()
 
 
-@ram_cmd(pattern=r"aliveu")
+@register(outgoing=True, pattern=r"^\.aliveu")
 async def amireallyaliveuser(username):
     message = username.text
     output = ".aliveu [new user without brackets] nor can it be empty"
@@ -359,7 +358,7 @@ async def amireallyaliveuser(username):
     await username.edit("`" f"{output}" "`")
 
 
-@ram_cmd(pattern=r"resetalive$")
+@register(outgoing=True, pattern=r"^\.resetalive$")
 async def amireallyalivereset(ureset):
     global DEFAULTUSER
     DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
@@ -368,20 +367,20 @@ async def amireallyalivereset(ureset):
 
 CMD_HELP.update({
     "sistem":
-    f"`{cmd}sysd`\
+    "`.sysd`\
 \nUsage: Shows system information using neofetch.\
-\n\n`{cmd}botver`\
+\n\n`.botver`\
 \nUsage: Shows the userbot version.\
-\n\n`{cmd}pip` <module(s)>\
+\n\n`.pip` <module(s)>\
 \nUsage: Does a search of pip modules(s).\
-\n\n`{cmd}start`\
+\n\n`.start`\
 \nUsage: Type .start to see whether your bot is working or not.\
-\n\n`{cmd}aliveu` <text>\
+\n\n`.aliveu` <text>\
 \nUsage: Changes the 'user' in alive to the text you want.\
-\n\n`{cmd}resetalive`\
+\n\n`.resetalive`\
 \nUsage: Resets the user to default.\
-\n\n`{cmd}db`\
+\n\n`.db`\
 \nUsage:Shows database related info.\
-\n\n`{cmd}spc`\
+\n\n.`.spc`\
 \nUsage:Show system specification."
 })

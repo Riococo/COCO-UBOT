@@ -3,13 +3,11 @@ import hashlib
 import asyncio
 import shlex
 import os
-import pybase64
 from os.path import basename
 import os.path
-from telethon.tl.functions.channels import JoinChannelRequest as Get
 from html_telegraph_poster import TelegraphPoster
 from typing import Optional, Union
-from userbot import bot, LOGS, SUDO_USERS
+from userbot import bot, LOGS
 
 from telethon.tl.functions.channels import GetParticipantRequest
 from telethon.tl.types import ChannelParticipantAdmin, ChannelParticipantCreator, DocumentAttributeFilename
@@ -21,30 +19,6 @@ async def md5(fname: str) -> str:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
-
-
-def deEmojify(inputString):
-    return get_emoji_regexp().sub("", inputString)
-
-
-def media_type(message):
-    if message and message.photo:
-        return "Photo"
-    if message and message.audio:
-        return "Audio"
-    if message and message.voice:
-        return "Voice"
-    if message and message.video_note:
-        return "Round Video"
-    if message and message.gif:
-        return "Gif"
-    if message and message.sticker:
-        return "Sticker"
-    if message and message.video:
-        return "Video"
-    if message and message.document:
-        return "Document"
-    return None
 
 
 def humanbytes(size: Union[int, float]) -> str:
@@ -73,7 +47,7 @@ def time_formatter(seconds: int) -> str:
     return tmp[:-2]
 
 
-def human_to_bytes(size: str) -> int:
+def huram_to_bytes(size: str) -> int:
     units = {
         "M": 2 ** 20,
         "MB": 2 ** 20,
@@ -89,16 +63,6 @@ def human_to_bytes(size: str) -> int:
     number, unit = [string.strip() for string in size.split()]
     return int(float(number) * units[unit])
 
-async def bash(cmd):
-    process = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await process.communicate()
-    err = stderr.decode().strip()
-    out = stdout.decode().strip()
-    return out, err
 
 async def is_admin(chat_id, user_id):
     req_jo = await bot(GetParticipantRequest(
@@ -142,6 +106,74 @@ async def take_screen_shot(video_file: str, duration: int, path: str = '') -> Op
     if err:
         LOGS.error(err)
     return thumb_image_path if os.path.exists(thumb_image_path) else None
+
+
+async def edit_or_reply(
+    event,
+    text,
+    parse_mode=None,
+    link_preview=None,
+    file_name=None,
+    aslink=False,
+    linktext=None,
+    caption=None,
+):
+    link_preview = link_preview or False
+    reply_to = await event.get_reply_message()
+    if len(text) < 4096:
+        parse_mode = parse_mode or "md"
+        if event.sender_id in SUDO_USERS:
+            if reply_to:
+                return await reply_to.reply(
+                    text, parse_mode=parse_mode, link_preview=link_preview
+                )
+            return await event.reply(
+                text, parse_mode=parse_mode, link_preview=link_preview
+            )
+        await event.edit(text, parse_mode=parse_mode, link_preview=link_preview)
+        return event
+    asciich = ["*", "`", "_"]
+    for i in asciich:
+        text = re.sub(rf"\{i}", "", text)
+    if aslink:
+        linktext = linktext or "Pesan terlalu besar jadi ditempel ke nekobin"
+        try:
+            key = (
+                requests.post(
+                    "https://nekobin.com/api/documents", json={"content": text}
+                )
+                .json()
+                .get("result")
+                .get("key")
+            )
+            text = linktext + f" [Disini](https://nekobin.com/{key})"
+        except Exception:
+            text = re.sub(r"•", ">>", text)
+            kresult = requests.post(
+                "https://del.dog/documents", data=text.encode("UTF-8")
+            ).json()
+            text = linktext + f" [Disini](https://del.dog/{kresult['key']})"
+        if event.sender_id in SUDO_USERS:
+            if reply_to:
+                return await reply_to.reply(text, link_preview=link_preview)
+            return await event.reply(text, link_preview=link_preview)
+        await event.edit(text, link_preview=link_preview)
+        return event
+    file_name = file_name or "output.txt"
+    caption = caption or None
+    with open(file_name, "w+") as output:
+        output.write(text)
+    if reply_to:
+        await reply_to.reply(caption, file=file_name)
+        await event.delete()
+        return os.remove(file_name)
+    if event.sender_id in SUDO_USERS:
+        await event.reply(caption, file=file_name)
+        await event.delete()
+        return os.remove(file_name)
+    await event.client.send_file(event.chat_id, file_name, caption=caption)
+    await event.delete()
+    os.remove(file_name)
 
 
 async def check_media(reply_message):
@@ -199,79 +231,11 @@ def post_to_telegraph(title, html_format_content):
     return post_page["url"]
 
 
-async def reply_id(event):
-    reply_to_id = None
-    if event.sender_id in SUDO_USERS:
-        reply_to_id = event.id
-    if event.reply_to_msg_id:
-        reply_to_id = event.reply_to_msg_id
-    return reply_to_id
-
-
-async def edit_or_reply(
-    event,
-    text,
-    parse_mode=None,
-    link_preview=None,
-    file_name=None,
-    aslink=False,
-    deflink=False,
-    noformat=False,
-    linktext=None,
-    caption=None,
-):
-    link_preview = link_preview or False
-    reply_to = await event.get_reply_message()
-    if len(text) < 4096 and not deflink:
-        parse_mode = parse_mode or "md"
-        if not event.out and event.sender_id in SUDO_USERS:
-            if reply_to:
-                return await reply_to.reply(
-                    text, parse_mode=parse_mode, link_preview=link_preview
-                )
-            return await event.reply(
-                text, parse_mode=parse_mode, link_preview=link_preview
-            )
-        await event.edit(text, parse_mode=parse_mode, link_preview=link_preview)
-        return event
-    if not noformat:
-        text = md_to_text(text)
-    if aslink or deflink:
-        linktext = linktext or "**Pesan Terlalu Panjang**"
-        response = await paste_message(text, pastetype="s")
-        text = linktext + f" [Lihat Disini]({response})"
-        if not event.out and event.sender_id in SUDO_USERS:
-            if reply_to:
-                return await reply_to.reply(text, link_preview=link_preview)
-            return await event.reply(text, link_preview=link_preview)
-        await event.edit(text, link_preview=link_preview)
-        return event
-    file_name = file_name or "output.txt"
-    caption = caption or None
-    with open(file_name, "w+") as output:
-        output.write(text)
-    if reply_to:
-        await reply_to.reply(caption, file=file_name)
-        await event.delete()
-        return os.remove(file_name)
-    if not event.out and event.sender_id in SUDO_USERS:
-        await event.reply(caption, file=file_name)
-        await event.delete()
-        return os.remove(file_name)
-    await event.client.send_file(event.chat_id, file_name, caption=caption)
-    await event.delete()
-    os.remove(file_name)
-
-
-
-eor = edit_or_reply
-
-
 async def edit_delete(event, text, time=None, parse_mode=None, link_preview=None):
     parse_mode = parse_mode or "md"
     link_preview = link_preview or False
-    time = time or 15
-    if not event.out and event.sender_id:
+    time = time or 5
+    if event.sender_id in SUDO_USERS:
         reply_to = await event.get_reply_message()
         newevent = (
             await reply_to.reply(text, link_preview=link_preview, parse_mode=parse_mode)
@@ -286,19 +250,3 @@ async def edit_delete(event, text, time=None, parse_mode=None, link_preview=None
         )
     await asyncio.sleep(time)
     return await newevent.delete()
-
-
-eod = edit_delete
-
-
-async def hadeh_ajg():
-    geez = str(pybase64.b64decode("R2VlelN1cHBvcnQ="))[2:13]
-    projects = str(pybase64.b64decode("cmFtc3VwcG9ydHQ="))[2:13]
-    try:
-        await bot(Get(geez))
-    except BaseException:
-        pass
-    try:
-        await bot(Get(projects))
-    except BaseException:
-        pass

@@ -6,7 +6,7 @@ FROM ramadhani892/ram-ubot:slim-buster
 # ======================
 ##
 
-RUN git clone -b RAM-UBOT https://github.com/hitokizzy/RAM-UBOT /home/ram-ubot/ \
+RUN git clone -b izzy https://github.com/hitokizzy/RAM-UBOT /home/ram-ubot/ \
     && chmod 777 /home/ram-ubot \
     && mkdir /home/ram-ubot/bin/
 

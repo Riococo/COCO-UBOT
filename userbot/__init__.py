@@ -411,7 +411,7 @@ from userbot import (
 )
 
 # ================= CONSTANT =================
-DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
+DEFAULTUSER = str(ALIVE_NAME) #if ALIVE_NAME else uname().node
 # ============================================
 
 async def update_restart_msg(chat_id, msg_id):
